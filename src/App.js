@@ -5,12 +5,6 @@ import * as BooksAPI from './BooksAPI';
 import BookShelf from './BookShelf';
 import SearchBooks from './SearchBooks';
 
-const shelves = [
-  { name: 'Currently Reading', tag: 'currentlyReading' },
-  { name: 'Want to Read', tag: 'wantToRead' },
-  { name: 'Read', tag: 'read' },
-];
-
 class BooksApp extends React.Component {
   state = {
     /**
@@ -20,18 +14,40 @@ class BooksApp extends React.Component {
      * pages, as well as provide a good URL they can bookmark and share.
      */
     showSearchPage: false,
-    books: [],
+    shelves: {
+      currentlyReading: [],
+      wantToRead: [],
+      read: []
+    }
+  };
+
+  bookByShelf = (books) => {
+    const shelves = this.state.shelves;
+    const newShelf = {};
+    for (let shelf in shelves) {
+      Object.assign(newShelf, {
+        [shelf]: books.filter((book) => book.shelf.includes(shelf)).flatMap((book) => [ book.id ])
+      });
+    }
+    return newShelf;
   };
 
   componentDidMount() {
     BooksAPI.getAll().then((books) => {
       this.setState(() => ({
-        books: books,
+        shelves: this.bookByShelf(books)
       }));
     });
   }
 
+  updateShelves = (shelves) => {
+    this.setState(() => ({
+      shelves
+    }));
+  };
+
   render() {
+    const { currentlyReading, wantToRead, read } = this.state.shelves;
     return (
       <div className='app'>
         {this.state.showSearchPage ? (
@@ -42,20 +58,22 @@ class BooksApp extends React.Component {
               <h1>MyReads</h1>
             </div>
             <div className='list-books-content'>
-              {!!this.state.books.length &&
-                shelves.map((shelf) => (
-                  <BookShelf
-                    key={shelf.name}
-                    shelfName={shelf.name}
-                    shelfTag={shelf.tag}
-                    books={this.state.books}
-                  />
-                ))}
+              <BookShelf
+                key={'currRead'}
+                title={'Currently Reading'}
+                books={currentlyReading}
+                updateShelves={this.updateShelves}
+              />
+              <BookShelf
+                key={'wantRead'}
+                title={'Want To Read'}
+                books={wantToRead}
+                updateShelves={this.updateShelves}
+              />
+              <BookShelf key={'read'} title={'Read'} books={read} updateShelves={this.updateShelves} />
             </div>
             <div className='open-search'>
-              <button onClick={() => this.setState({ showSearchPage: true })}>
-                Add a book
-              </button>
+              <button onClick={() => this.setState({ showSearchPage: true })}>Add a book</button>
             </div>
           </div>
         )}

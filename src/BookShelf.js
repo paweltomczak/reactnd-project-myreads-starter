@@ -1,33 +1,16 @@
 import React, { Component } from 'react';
 import Book from './Book';
-import * as BooksAPI from './BooksAPI';
 
 class BookShelf extends Component {
-  componentDidMount() {
-    const { books, shelfTag } = this.props;
-    this.setState(() => ({
-      [shelfTag]: books.filter((book) => book.shelf === shelfTag),
-    }));
-  }
   render() {
-    const { shelfName, shelfTag } = this.props;
+    const { books, title, updateShelves } = this.props;
     return (
       <div>
         <div className='bookshelf'>
-          <h2 className='bookshelf-title'>{shelfName}</h2>
+          <h2 className='bookshelf-title'>{title}</h2>
           <div className='bookshelf-books'>
             <ul className='books-grid'>
-              {this.state &&
-                this.state[shelfTag].map((book) => (
-                  <Book
-                    key={book.id}
-                    title={book.title}
-                    authors={book.authors}
-                    background={
-                      book.imageLinks ? book.imageLinks.thumbnail : ''
-                    }
-                  />
-                ))}
+              {books.map((book) => <Book updateShelves={updateShelves} key={book} id={book} />)}
             </ul>
           </div>
         </div>
