@@ -6,11 +6,11 @@ import debounce from 'lodash.debounce';
 class SearchBooks extends Component {
   state = {
     query: '',
-    searchedBooks: [],
+    searchedBooks: []
   };
   updateQuery = (query) => {
     this.setState(() => ({
-      query: query,
+      query: query
     }));
     this.getSearchedBooks(query);
   };
@@ -18,24 +18,22 @@ class SearchBooks extends Component {
     if (query) {
       BooksAPI.search(query).then((books) => {
         this.setState(() => ({
-          searchedBooks: books,
+          searchedBooks: books
         }));
       });
     } else {
       this.setState(() => ({
-        searchedBooks: [],
+        searchedBooks: []
       }));
     }
   }, 500);
   render() {
     const { query, searchedBooks } = this.state;
+    const { updateShelves } = this.props;
     return (
       <div className='search-books'>
         <div className='search-books-bar'>
-          <button
-            className='close-search'
-            onClick={() => this.setState({ showSearchPage: false })}
-          >
+          <button className='close-search' onClick={() => this.setState({ showSearchPage: false })}>
             Close
           </button>
           <div className='search-books-input-wrapper'>
@@ -59,18 +57,11 @@ class SearchBooks extends Component {
         </div>
         <div className='search-books-results'>
           <ol className='books-grid'>
-            {searchedBooks.length && query !== ''
-              ? searchedBooks.map((book) => (
-                  <Book
-                    key={book.id}
-                    title={book.title}
-                    authors={book.authors}
-                    background={
-                      book.imageLinks ? book.imageLinks.thumbnail : ''
-                    }
-                  />
-                ))
-              : ''}
+            {searchedBooks.length && query !== '' ? (
+              searchedBooks.map((book) => <Book updateShelves={updateShelves} key={book.id} id={book.id} />)
+            ) : (
+              ''
+            )}
             {searchedBooks.error && `No books found matching the "${query}" `}
           </ol>
         </div>
