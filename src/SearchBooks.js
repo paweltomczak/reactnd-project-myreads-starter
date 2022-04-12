@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Book from './Book';
 import * as BooksAPI from './BooksAPI';
+import debounce from 'lodash.debounce';
 
 class SearchBooks extends Component {
   state = {
@@ -9,11 +10,11 @@ class SearchBooks extends Component {
   };
   updateQuery = (query) => {
     this.setState(() => ({
-      query: query.trim(),
+      query: query,
     }));
     this.getSearchedBooks(query);
   };
-  getSearchedBooks = (query) => {
+  getSearchedBooks = debounce((query) => {
     if (query) {
       BooksAPI.search(query).then((books) => {
         this.setState(() => ({
@@ -25,7 +26,7 @@ class SearchBooks extends Component {
         searchedBooks: [],
       }));
     }
-  };
+  }, 500);
   render() {
     const { query, searchedBooks } = this.state;
     return (
