@@ -1,7 +1,33 @@
 import React, { Component } from 'react';
+import Book from './Book';
+import * as BooksAPI from './BooksAPI';
 
 class SearchBooks extends Component {
+  state = {
+    query: '',
+    searchedBooks: [],
+  };
+  updateQuery = (query) => {
+    this.setState(() => ({
+      query: query.trim(),
+    }));
+    this.getSearchedBooks(query);
+  };
+  getSearchedBooks = (query) => {
+    if (query) {
+      BooksAPI.search(query).then((books) => {
+        this.setState(() => ({
+          searchedBooks: books,
+        }));
+      });
+    } else {
+      this.setState(() => ({
+        searchedBooks: [],
+      }));
+    }
+  };
   render() {
+    const { query, searchedBooks } = this.state;
     return (
       <div className='search-books'>
         <div className='search-books-bar'>
@@ -20,11 +46,32 @@ class SearchBooks extends Component {
             However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
             you don't find a specific author or title. Every search is limited by search terms.
           */}
-            <input type='text' placeholder='Search by title or author' />
+            <input
+              type='text'
+              placeholder='Search by title or author'
+              onChange={(e) => {
+                this.updateQuery(e.target.value);
+              }}
+              value={query}
+            />
           </div>
         </div>
         <div className='search-books-results'>
-          <ol className='books-grid' />
+          <ol className='books-grid'>
+            {searchedBooks.length && query !== ''
+              ? searchedBooks.map((book) => (
+                  <Book
+                    key={book.id}
+                    title={book.title}
+                    authors={book.authors}
+                    background={
+                      book.imageLinks ? book.imageLinks.thumbnail : ''
+                    }
+                  />
+                ))
+              : ''}
+            {searchedBooks.error && `No books found matching the "${query}" `}
+          </ol>
         </div>
       </div>
     );
