@@ -5,6 +5,12 @@ import * as BooksAPI from './BooksAPI';
 import BookShelf from './BookShelf';
 import SearchBooks from './SearchBooks';
 
+const shelves = [
+  { name: 'Currently Reading', tag: 'currentlyReading' },
+  { name: 'Want to Read', tag: 'wantToRead' },
+  { name: 'Read', tag: 'read' },
+];
+
 class BooksApp extends React.Component {
   state = {
     /**
@@ -36,7 +42,15 @@ class BooksApp extends React.Component {
               <h1>MyReads</h1>
             </div>
             <div className='list-books-content'>
-              <BookShelf />
+              {!!this.state.books.length &&
+                shelves.map((shelf) => (
+                  <BookShelf
+                    key={shelf.name}
+                    shelfName={shelf.name}
+                    shelfTag={shelf.tag}
+                    books={this.state.books}
+                  />
+                ))}
             </div>
             <div className='open-search'>
               <button onClick={() => this.setState({ showSearchPage: true })}>

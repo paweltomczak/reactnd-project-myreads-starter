@@ -1,31 +1,33 @@
 import React, { Component } from 'react';
 import Book from './Book';
+import * as BooksAPI from './BooksAPI';
 
 class BookShelf extends Component {
+  componentDidMount() {
+    const { books, shelfTag } = this.props;
+    this.setState(() => ({
+      [shelfTag]: books.filter((book) => book.shelf === shelfTag),
+    }));
+  }
   render() {
+    const { shelfName, shelfTag } = this.props;
     return (
       <div>
         <div className='bookshelf'>
-          <h2 className='bookshelf-title'>Currently Reading</h2>
+          <h2 className='bookshelf-title'>{shelfName}</h2>
           <div className='bookshelf-books'>
             <ul className='books-grid'>
-              <Book />
-            </ul>
-          </div>
-        </div>
-        <div className='bookshelf'>
-          <h2 className='bookshelf-title'>Want to Read</h2>
-          <div className='bookshelf-books'>
-            <ul className='books-grid'>
-              <Book />
-            </ul>
-          </div>
-        </div>
-        <div className='bookshelf'>
-          <h2 className='bookshelf-title'>Read</h2>
-          <div className='bookshelf-books'>
-            <ul className='books-grid'>
-              <Book />
+              {this.state &&
+                this.state[shelfTag].map((book) => (
+                  <Book
+                    key={book.id}
+                    title={book.title}
+                    authors={book.authors}
+                    background={
+                      book.imageLinks ? book.imageLinks.thumbnail : ''
+                    }
+                  />
+                ))}
             </ul>
           </div>
         </div>
