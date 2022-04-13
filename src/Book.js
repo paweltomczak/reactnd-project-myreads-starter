@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { update, get } from './BooksAPI';
+import { Navigate } from 'react-router-dom';
 
 class Book extends Component {
   state = {
-    bookDetails: []
+    bookDetails: [],
+    redirect: null
   };
   componentDidMount() {
     get(this.props.id).then((details) => {
@@ -15,6 +17,7 @@ class Book extends Component {
   handleShelfChange = (e) => {
     const { value } = e.target;
     const book = this.state.bookDetails;
+    this.setState({ redirect: '/' });
     update(book, value).then((shelves) => {
       return this.props.updateShelves(shelves);
     });
@@ -23,6 +26,7 @@ class Book extends Component {
     const { imageLinks, title, authors, shelf } = this.state.bookDetails;
     return (
       <li>
+        {window.location.pathname === '/search' && this.state.redirect && <Navigate to='/' />}
         <div className='book'>
           <div className='book-top'>
             <div
