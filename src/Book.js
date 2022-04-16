@@ -1,32 +1,37 @@
 import React, { Component } from 'react';
 import { update, get } from './BooksAPI';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
+import Loading from './Loading';
 
 class Book extends Component {
   state = {
     bookDetails: [],
-    redirect: null
+    redirect: null,
+    isLoading: true
   };
   componentDidMount() {
     get(this.props.id).then((details) => {
       this.setState(() => ({
-        bookDetails: details
+        bookDetails: details,
+        isLoading: false
       }));
     });
   }
   handleShelfChange = (e) => {
     const { value } = e.target;
     const book = this.state.bookDetails;
-    this.setState({ redirect: '/' });
+    this.setState({ redirect: '/', isLoading: true });
     update(book, value).then((shelves) => {
       return this.props.updateShelves(shelves);
     });
   };
   render() {
-    const { imageLinks, title, authors, shelf } = this.state.bookDetails;
+    const { imageLinks, title, authors, shelf, id } = this.state.bookDetails;
+    const { isLoading } = this.state;
     return (
       <li>
         {window.location.pathname === '/search' && this.state.redirect && <Navigate to='/' />}
+        {isLoading && <Loading />}
         <div className='book'>
           <div className='book-top'>
             <div
@@ -37,6 +42,11 @@ class Book extends Component {
                 backgroundImage: `url(${imageLinks ? imageLinks.thumbnail : ''})`
               }}
             />
+            <Link to={`/book/${id}`}>
+              <div className='book-cover-details'>
+                <div className='book-cover-text'>View Details</div>
+              </div>
+            </Link>
             <div className='book-shelf-changer'>
               <select value={shelf} onChange={this.handleShelfChange}>
                 <option value='move' disabled>

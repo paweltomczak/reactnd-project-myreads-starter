@@ -1,18 +1,20 @@
-import React from 'react';
+import React, { Component } from 'react';
 // import * as BooksAPI from './BooksAPI'
 import './App.css';
-import * as BooksAPI from './BooksAPI';
-import BookShelf from './BookShelf';
+import Home from './Home';
 import SearchBooks from './SearchBooks';
-import { Route, Routes, Link } from 'react-router-dom';
+import BookDetails from './BookDetails';
+import { getAll as getAllBooks } from './BooksAPI';
+import { Route, Routes } from 'react-router-dom';
 
-class BooksApp extends React.Component {
+class BooksApp extends Component {
   state = {
     shelves: {
       currentlyReading: [],
       wantToRead: [],
       read: []
-    }
+    },
+    isLoading: true
   };
 
   bookByShelf = (books) => {
@@ -27,9 +29,10 @@ class BooksApp extends React.Component {
   };
 
   componentDidMount() {
-    BooksAPI.getAll().then((books) => {
+    getAllBooks().then((books) => {
       this.setState(() => ({
-        shelves: this.bookByShelf(books)
+        shelves: this.bookByShelf(books),
+        isLoading: false
       }));
     });
   }
@@ -41,39 +44,17 @@ class BooksApp extends React.Component {
   };
 
   render() {
-    const { currentlyReading, wantToRead, read } = this.state.shelves;
     return (
       <div className='app'>
         <Routes>
-          <Route path='search' element={<SearchBooks updateShelves={this.updateShelves} />} />
           <Route
             path='/'
             element={
-              <div className='list-books'>
-                <div className='list-books-title'>
-                  <h1>myReads</h1>
-                </div>
-                <div className='list-books-content'>
-                  <BookShelf
-                    key={'currRead'}
-                    title={'Currently Reading'}
-                    books={currentlyReading}
-                    updateShelves={this.updateShelves}
-                  />
-                  <BookShelf
-                    key={'wantRead'}
-                    title={'Want To Read'}
-                    books={wantToRead}
-                    updateShelves={this.updateShelves}
-                  />
-                  <BookShelf key={'read'} title={'Read'} books={read} updateShelves={this.updateShelves} />
-                </div>
-                <div className='open-search'>
-                  <Link to='/search'>Add a book</Link>
-                </div>
-              </div>
+              <Home shelves={this.state.shelves} updateShelves={this.updateShelves} isLoading={this.state.isLoading} />
             }
           />
+          <Route path='/search' element={<SearchBooks updateShelves={this.updateShelves} />} />
+          <Route path='/book/:bookId' element={<BookDetails />} />
         </Routes>
       </div>
     );

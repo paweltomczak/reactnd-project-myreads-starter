@@ -3,11 +3,13 @@ import Book from './Book';
 import * as BooksAPI from './BooksAPI';
 import debounce from 'lodash.debounce';
 import { Link } from 'react-router-dom';
+import Loading from './Loading';
 
 class SearchBooks extends Component {
   state = {
     query: '',
-    searchedBooks: []
+    searchedBooks: [],
+    isLoading: false
   };
   updateQuery = (query) => {
     this.setState(() => ({
@@ -17,9 +19,11 @@ class SearchBooks extends Component {
   };
   getSearchedBooks = debounce((query) => {
     if (query) {
+      this.setState({ isLoading: true });
       BooksAPI.search(query).then((books) => {
         this.setState(() => ({
-          searchedBooks: books
+          searchedBooks: books,
+          isLoading: false
         }));
       });
     } else {
@@ -29,7 +33,7 @@ class SearchBooks extends Component {
     }
   }, 500);
   render() {
-    const { query, searchedBooks } = this.state;
+    const { query, searchedBooks, isLoading } = this.state;
     const { updateShelves } = this.props;
     return (
       <div className='search-books'>
@@ -47,6 +51,7 @@ class SearchBooks extends Component {
             you don't find a specific author or title. Every search is limited by search terms.
           */}
             <input
+              autoFocus
               type='text'
               placeholder='Search by title or author'
               onChange={(e) => {
@@ -58,7 +63,8 @@ class SearchBooks extends Component {
         </div>
         <div className='search-books-results'>
           <ol className='books-grid'>
-            {searchedBooks.length && query !== '' ? (
+            {isLoading && <Loading />}
+            {!isLoading && searchedBooks.length && query !== '' ? (
               searchedBooks.map((book) => <Book updateShelves={updateShelves} key={book.id} id={book.id} />)
             ) : (
               ''
