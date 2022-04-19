@@ -274,6 +274,20 @@ button:active {
   font-weight: bold;
 }
 
+.back-button {
+  display: block;
+  width: 210px;
+  height: 53px;
+  background-image: url('./icons/arrow-back.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 28px;
+  font-size: 0;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
 /* Loading */
 
 .loading-container {

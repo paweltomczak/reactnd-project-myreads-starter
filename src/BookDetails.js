@@ -6,23 +6,28 @@ import Loading from './Loading';
 const BookDetails = () => {
   let navigate = useNavigate();
   const { bookId } = useParams();
-  const [ book, setBook ] = useState([]);
-  const [ isLoading, setIsLoading ] = useState(true);
+  const [book, setBook] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-    getBook(bookId).then((bookDetails) => setBook(bookDetails)).then(() => setIsLoading(false));
+    getBook(bookId)
+      .then((bookDetails) => setBook(bookDetails))
+      .then(() => setIsLoading(false));
   }, []);
-  const { title, authors, categories, description, imageLinks, pageCount, publishedDate } = book;
+  const {
+    title,
+    authors,
+    categories,
+    description,
+    imageLinks,
+    pageCount,
+    publishedDate,
+  } = book;
   return (
     <div>
       {isLoading && <Loading />}
       {!isLoading && (
         <div className='book-details'>
-          <img
-            src='/static/media/arrow-back.20e8847d.svg'
-            alt={title}
-            className='close-search'
-            onClick={() => navigate(-1)}
-          />
+          <div className='back-button' onClick={() => navigate(-1)} />
           <div className='book-details__cover'>
             <img src={imageLinks && imageLinks.thumbnail} alt={title} />
           </div>
